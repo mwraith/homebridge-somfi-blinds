@@ -1,0 +1,34 @@
+{
+  "name": "homebridge-rpi-rts",
+  "description": "A Homebridge plugin to add HomeKit compatibility to Somfy RTS devices (rolling shutters, blinds, awnings, ...) requiring only a Raspberry Pi and a simple 433 MHz transmitter.",
+  "version": "1.1.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wibberryd/homebridge-rpi-rts.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "raspberry",
+    "pi",
+    "somfy",
+    "rts",
+    "homekit"
+  ],
+  "author": "wibberryd",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wibberryd/homebridge-rpi-rts/issues"
+  },
+  "homepage": "https://github.com/wibberryd/homebridge-rpi-rts",
+  "engines": {
+    "homebridge": ">=1.0.0",
+    "node": ">=10.17.0"
+  },
+  "dependencies": {
+    "pigpio": "^3.1.1"
+  }
+}
