@@ -1,4 +1,4 @@
-import SomfyRtsRemoteAccessory from '../src/SomfyRtsRemoteAccessory.js';
+import SomfyRtsRemoteAccessory from './SomfyRtsRemoteAccessory.js';
 
 module.exports = (api) => {
 	api.registerAccessory('Somfy Blinds', SomfyRtsRemoteAccessory);
