@@ -27,7 +27,7 @@ class SwitchServiceMock {
         return this;
     }
 
-    setCharacteristic(characteristic, value) {
+    updateCharacteristic(characteristic, value) {
         return this;
     }
 

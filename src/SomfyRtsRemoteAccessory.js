@@ -122,7 +122,7 @@ import * as BlindState from './BlindState.js';
             this.log.debug(`Auto switching button ${button}`);
 
             this.states[button] = false;
-			this.switchServices[button].setCharacteristic(this.api.hap.Characteristic.On, false);
+			this.switchServices[button].updateCharacteristic(this.api.hap.Characteristic.On, false);
 		}.bind(this), this.delay);
 	}
 	
