@@ -3,7 +3,7 @@
   "displayName": "Somfy Blinds Remote",
   "description": "A Homebridge plugin to add HomeKit compatibility to Somfy RTS devices (rolling shutters, blinds, awnings, ...) requiring only a Raspberry Pi and a simple 433 MHz transmitter.",
   "version": "0.1.0",
-  "main": "./src/index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "jest",
     "build": "babel src -d lib"
@@ -35,6 +35,8 @@
     "pigpio": "^3.1.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
     "@babel/plugin-transform-runtime": "^7.16.4",
     "@babel/preset-env": "^7.16.4",
     "jest": "^27.4.3"
