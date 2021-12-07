@@ -8,6 +8,9 @@
     "test": "jest",
     "build": "babel src -d lib"
   },
+  "jest": {
+    "testPathIgnorePatterns": ["lib"]
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mwraith/somfi-blinds-homebridge.git"

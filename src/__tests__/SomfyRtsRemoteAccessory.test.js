@@ -1,6 +1,8 @@
-import SomfyRtsRemoteAccessory from '../src/SomfyRtsRemoteAccessory.js';
-import * as fs from 'fs';
-import * as BlindState from '../src/BlindState.js';
+import SomfyRtsRemoteAccessory from '../SomfyRtsRemoteAccessory.js';
+import * as BlindState from '../BlindState.js';
+
+// Mock the file system methods
+jest.mock('fs');
 
 // Need to mock timers for the admin buttons that switch off after X ms
 jest.useFakeTimers();
@@ -13,7 +15,7 @@ const log = {
     debug: function(text) { if (LOGGING_ON) console.log(text); }
 }
 
-// Switch Server
+// A mock Switch accessory
 class SwitchServiceMock {
     constructor(buttonName, button) {
         this.buttonName = buttonName;
@@ -29,18 +31,24 @@ class SwitchServiceMock {
         return this;
     }
 
-    on(method, f) {
-        this.methods[method] = f;
+    onGet(f) {
+        this.getMethod = f;
+
+        return this;
+    }
+
+    onSet(f) {
+        this.setMethod = f;
 
         return this;
     }
 
     get() {
-        return this.methods["get"]();
+        return this.getMethod();
     }
 
     set(value) {
-        return this.methods["set"](value);
+        return this.setMethod(value);
     }
 }
 
@@ -56,23 +64,14 @@ const api = {
     }
 };
 
-const clearTests = config => {
-    if (fs.existsSync(`./${config.id}.json`)) {
-        fs.rmSync(`./${config.id}.json`);
-    }
-};
-
 describe("Testing Main Class", () => {
     test("check services with admin mode", () => {
         // Config for the accessory
         const config = {
-            "id": 99900,
+            "id": 99100,
             "name": "test",
             "adminMode": true
         };
-
-        // First clear out any previous tests
-        clearTests(config);
 
         // Create the accessory
         let rts = new SomfyRtsRemoteAccessory(log, config, api);
@@ -80,21 +79,15 @@ describe("Testing Main Class", () => {
 
         // Check we have Toggle, Up, Down, My, Prog buttons
         expect(services.length).toEqual(5);
-
-        // Clear again
-        clearTests(config);
     });
 
     test("check services with non admin mode", () => {
         // Config for the accessory
         const config = {
-            "id": 99901,
+            "id": 99101,
             "name": "test",
             "adminMode": false
         };
-
-        // First clear out any previous tests
-        clearTests(config);
 
         // Create the accessory
         let rts = new SomfyRtsRemoteAccessory(log, config, api);
@@ -102,21 +95,15 @@ describe("Testing Main Class", () => {
 
         // Check we have Toggle only
         expect(services.length).toEqual(1);
-
-        // Clear again
-        clearTests(config);
     });
-/*
+
     test("check admin buttons", () => {
         // Config for the accessory
         const config = {
-            "id": 99902,
+            "id": 99102,
             "name": "test",
             "adminMode": true
         };
-
-        // First clear out any previous tests
-        clearTests(config);
 
         // Create the accessory
         let rts = new SomfyRtsRemoteAccessory(log, config, api);
@@ -152,21 +139,15 @@ describe("Testing Main Class", () => {
                 });
             }
         });
-
-        // Clear again
-        clearTests(config);
     });
 
     test("check toggle button", () => {
         // Config for the accessory
         const config = {
-            "id": 99903,
+            "id": 99103,
             "name": "test",
             "adminMode": false
         };
-
-        // First clear out any previous tests
-        clearTests(config);
 
         // Create the accessory
         let rts = new SomfyRtsRemoteAccessory(log, config, api);
@@ -187,10 +168,7 @@ describe("Testing Main Class", () => {
         });
 
         // Check the rolling code has been advanced by 2
-        const configNew = BlindState.get(config.id);
-        expect(configNew.rollingCode).toEqual(3);
-
-        // Clear again
-        clearTests(config);
-    });*/
+        const code = BlindState.getRollingCode(config.id);
+        expect(code).toEqual(3);
+    });
 });

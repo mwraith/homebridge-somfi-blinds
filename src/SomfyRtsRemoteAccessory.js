@@ -42,8 +42,8 @@ import * as BlindState from './BlindState.js';
 			
 			// Bind functions to manage events
 			service.getCharacteristic(Characteristic.On)
-					.on('get', this.getOn.bind(this, button))
-					.on('set', this.setOn.bind(this, button));
+					.onGet(this.getOn.bind(this, button))
+					.onSet(this.setOn.bind(this, button));
 
             this.switchServices[button] = service;
 		});
@@ -90,10 +90,10 @@ import * as BlindState from './BlindState.js';
 
 		if (button == 'Toggle') {
 			// For the Toggle button we persist the change to the file
-			const state1 = BlindState.setOn(this.config.id, value);
+			const state = BlindState.setOn(this.config.id, value);
 
             // Log
-			const stringifyState = JSON.stringify(state2);
+			const stringifyState = JSON.stringify(state);
 			this.log.debug(`Triggered SET for ${this.config.id} - ${stringifyState}`);
 		}
 		else {
