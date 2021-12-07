@@ -89,11 +89,10 @@ import * as BlindState from './BlindState.js';
 
 		if (button == 'Toggle') {
 			// For the Toggle button we persist the change to the file
-			const state = BlindState.setOn(this.config.id, value);
+			BlindState.setOn(this.config.id, value);
 
             // Log
-			const stringifyState = JSON.stringify(state);
-			this.log.debug(`Triggered SET for ${this.config.id} - ${stringifyState}`);
+			this.log.debug(`Triggered SET for ${this.config.id} - ${value}`);
 		}
 		else {
 			// For other buttons we change the internal state and set a timer to change it back
