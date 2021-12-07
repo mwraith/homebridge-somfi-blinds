@@ -171,4 +171,27 @@ describe("Testing Main Class", () => {
         const code = BlindState.getRollingCode(config.id);
         expect(code).toEqual(3);
     });
+
+    test("check that admin buttons only advance code by 1", () => {
+        // Config for the accessory
+        const config = {
+            "id": 99104,
+            "name": "test",
+            "adminMode": true
+        };
+
+        // Create the accessory
+        let rts = new SomfyRtsRemoteAccessory(log, config, api);
+        let services = rts.getServices();
+
+        // Trigger admin buttons
+        services[1].set(true);
+        
+        // Fast-forward until all timers have been executed
+        jest.runAllTimers();
+
+        // Expect code to be 2
+        const code = BlindState.getRollingCode(config.id);
+        expect(code).toEqual(2);
+    });
 });

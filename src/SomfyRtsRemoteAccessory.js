@@ -27,7 +27,7 @@ import * as BlindState from './BlindState.js';
 		const Characteristic = this.api.hap.Characteristic;
 
 		// Delay to reset the switch after being pressed
-		this.delay = 500;
+		this.delay = 1000;
 
 		// Decide what buttons the user should get
 		let buttons = this.config.adminMode ? ['Toggle', 'Up', 'Down', 'My', 'Prog'] : ['Toggle'];
