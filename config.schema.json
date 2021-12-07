@@ -1,5 +1,5 @@
 {
-	"pluginAlias": "Somfy RTS Remote",
+	"pluginAlias": "Somfy Blinds Remote",
 	"pluginType": "accessory",
 	"singular": false,
 	"schema": {
