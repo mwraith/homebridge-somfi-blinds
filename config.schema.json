@@ -9,7 +9,7 @@
 				"title": "Name",
 				"description": "Name of the accessory as it will appear in Apple Home App",
 				"type": "string",
-				"default": "Shutter 1",
+				"default": "Blind 1",
 				"required": true
 			},
 			"id": {
@@ -21,9 +21,9 @@
 				"minimum": 0,
 				"maximum": 16777216
 			},
-			"prog": {
-				"title": "Show Prog Button",
-				"description": "Disable after the pairing phase to hide the Prog button",
+			"adminMode": {
+				"title": "Admin Mode",
+				"description": "Used to initially programme the remote",
 				"type": "boolean",
 				"default": true
 			}
