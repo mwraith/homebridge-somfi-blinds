@@ -1,7 +1,7 @@
 {
   "name": "somfi-blinds-homebridge",
   "description": "A Homebridge plugin to add HomeKit compatibility to Somfy RTS devices (rolling shutters, blinds, awnings, ...) requiring only a Raspberry Pi and a simple 433 MHz transmitter.",
-  "version": "0.1",
+  "version": "0.1.0",
   "main": "./src/index.js",
   "scripts": {
     "test": "jest"
