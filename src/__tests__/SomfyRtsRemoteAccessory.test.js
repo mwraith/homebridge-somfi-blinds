@@ -4,6 +4,9 @@ import * as BlindState from '../BlindState.js';
 // Mock the file system methods
 jest.mock('fs');
 
+// Mock the PiGpio methods
+jest.mock('pigpio');
+
 // Need to mock timers for the admin buttons that switch off after X ms
 jest.useFakeTimers();
 jest.spyOn(global, 'setTimeout');

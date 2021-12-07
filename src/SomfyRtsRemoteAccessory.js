@@ -1,4 +1,4 @@
-//const RpiGpioRts = require('./RpiGpioRts');
+import * as RpiGpioRts from './RpiGpioRts.js';
 import * as BlindState from './BlindState.js';
 
 /**
@@ -21,7 +21,6 @@ import * as BlindState from './BlindState.js';
 		this.log = log;
 		this.config = config;
 		this.api = api;
-		//this.emitter = new RpiGpioRts(log, config);
 
 		const Service = this.api.hap.Service;
 		const Characteristic = this.api.hap.Characteristic;
@@ -141,8 +140,17 @@ import * as BlindState from './BlindState.js';
      * Send a command to the device
      */
     sendCommand(button) {
+		// Get current rolling code
+		const rollingCode = BlindState.getRollingCode(this.config.id);
+
+		// Switch toggle into a real direction
+		if (button == 'Toggle') {
+			button = BlindState.getOn() ? 'Up' : 'Down';
+		}
+
         // Emit command
-        // this.emitter.sendCommand(button);
+		console.log(`${this.config.id}, ${RpiGpioRts.BUTTON[button]}, ${rollingCode}`);
+        RpiGpioRts.sendCommand(this.config.id, RpiGpioRts.BUTTON[button], rollingCode);
 
         // Advance the rolling code
         BlindState.advanceRollingCode(this.config.id);
