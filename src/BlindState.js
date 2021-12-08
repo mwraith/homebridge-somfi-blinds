@@ -48,6 +48,8 @@ function readStateFromFile(id) {
  * @returns {Boolean} - true = blind closed; false = blind open
  */
 export function getOn(id) {
+    if (!id) throw('No id passed to function');
+
     let state = readStateFromFile(id);
 
     return state.on;
@@ -61,10 +63,12 @@ export function getOn(id) {
  * @returns {Boolean} - true = blind closed; false = blind open
  */
 export function setOn(id, value) {
+    if (!id) throw('No id passed to function');
+
     let state = readStateFromFile(id);
 
     // Update value
-    state["on"] = value;
+    state["on"] = !!value;
 
     writeStateToFile(id, state);
 }
@@ -76,6 +80,8 @@ export function setOn(id, value) {
  * @returns {Integer} - Value of the current rolling code
  */
  export function getRollingCode(id) {
+    if (!id) throw('No id passed to function');
+
     let state = readStateFromFile(id);
 
     return state.rollingCode;
@@ -88,6 +94,8 @@ export function setOn(id, value) {
  * @returns {Integer} - Value of the new rolling code
  */
  export function advanceRollingCode(id) {
+    if (!id) throw('No id passed to function');
+
     let state = readStateFromFile(id);
 
     // Advance code

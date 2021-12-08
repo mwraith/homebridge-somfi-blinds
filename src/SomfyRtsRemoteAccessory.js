@@ -87,6 +87,8 @@ import * as BlindState from './BlindState.js';
 	async setOn(button, value) {
 		this.log.debug(`Function setOn called for button ${button} with value ${value}`);
 
+		this.sendCommand(button);
+
 		if (button == 'Toggle') {
 			// For the Toggle button we persist the change to the file
 			BlindState.setOn(this.config.id, value);
@@ -103,8 +105,6 @@ import * as BlindState from './BlindState.js';
 				this.resetSwitchWithTimeout(button);
 			}
 		}
-
-        this.sendCommand(button);
 	}
 
 	/**
@@ -144,7 +144,7 @@ import * as BlindState from './BlindState.js';
 
 		// Switch toggle into a real direction
 		if (button == 'Toggle') {
-			button = BlindState.getOn() ? 'Up' : 'Down';
+			button = BlindState.getOn(this.config.id) ? 'Up' : 'Down';
 		}
 
         // Emit command
