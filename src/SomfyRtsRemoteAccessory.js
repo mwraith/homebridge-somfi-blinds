@@ -1,5 +1,6 @@
 import * as RpiGpioRts from './RpiGpioRts.js';
 import * as BlindState from './BlindState.js';
+import { doWhileStatement } from '@babel/types';
 
 /**
  * Class simulating a Somfy RTS Remote Accessory for Homebridge
@@ -87,7 +88,7 @@ import * as BlindState from './BlindState.js';
 	async setOn(button, value) {
 		this.log.debug(`Function setOn called for button ${button} with value ${value}`);
 
-		this.sendCommand(button);
+		this.sendCommand(button, value);
 
 		if (button == 'Toggle') {
 			// For the Toggle button we persist the change to the file
@@ -138,18 +139,20 @@ import * as BlindState from './BlindState.js';
     /**
      * Send a command to the device
      */
-    sendCommand(button) {
+    sendCommand(button, value) {
 		// Get current rolling code
 		const rollingCode = BlindState.getRollingCode(this.config.id);
 
 		// Switch toggle into a real direction
 		if (button == 'Toggle') {
-			if (this.config.invertToggle) {
-				button = BlindState.getOn(this.config.id) ? 'Down' : 'Up';
-			}
-			else {
-				button = BlindState.getOn(this.config.id) ? 'Up' : 'Down';
-			}
+			/*
+			 	Value    Invert
+				true     false     = Down
+				true     true      = Up
+				false    false     = Up
+				false    true      = Down
+			*/
+			button = this.config.invertToggle ^ value ? 'Down' : 'Up';
 		}
 
         // Emit command
