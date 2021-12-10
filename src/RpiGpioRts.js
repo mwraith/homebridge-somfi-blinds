@@ -26,7 +26,7 @@ export const BUTTON = {
  * @param {String} button - The button pressed: Up, Down, My, Prog
  * @return {Array} - An array containing the services
 */
-export function sendCommand(id, rollingCode, button) {
+export function sendCommand(id, button, rollingCode) {
 	const pigpio = require('pigpio');
 	const payloadData = getPayloadData(id, button, rollingCode);
 	const waveform = getWaveform(payloadData, 4);
