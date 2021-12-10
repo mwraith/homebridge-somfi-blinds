@@ -26,6 +26,12 @@
 				"description": "Used to initially programme the remote",
 				"type": "boolean",
 				"default": true
+			},
+			"invertToggle": {
+				"title": "Invert Direction",
+				"description": "Used for blinds that go up",
+				"type": "boolean",
+				"default": false
 			}
 		}
 	}

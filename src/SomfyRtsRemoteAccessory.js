@@ -144,7 +144,12 @@ import * as BlindState from './BlindState.js';
 
 		// Switch toggle into a real direction
 		if (button == 'Toggle') {
-			button = BlindState.getOn(this.config.id) ? 'Up' : 'Down';
+			if (this.config.invertToggle) {
+				button = BlindState.getOn(this.config.id) ? 'Down' : 'Up';
+			}
+			else {
+				button = BlindState.getOn(this.config.id) ? 'Up' : 'Down';
+			}
 		}
 
         // Emit command
