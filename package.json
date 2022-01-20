@@ -35,11 +35,11 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.16.3",
-    "pigpio": "^3.1.1"
+    "pigpio": "^3.1.1",
+    "@babel/core": "^7.16.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
-    "@babel/core": "^7.16.0",
     "@babel/plugin-transform-runtime": "^7.16.4",
     "@babel/preset-env": "^7.16.4",
     "jest": "^27.4.3"
