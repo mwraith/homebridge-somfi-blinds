@@ -205,10 +205,10 @@ describe("Testing Main Class", () => {
         });
 
         // Open blind
-        services[0].set(1);
+        services[0].set(0);
 
         services[0].get().then(data => {
-            expect(data).toEqual(1);
+            expect(data).toEqual(0);
         });
 
         // Check the rolling code has been advanced by 2

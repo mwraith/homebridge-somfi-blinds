@@ -29,7 +29,7 @@ export const BUTTON = {
 export function sendCommand(id, button, rollingCode) {
 	const pigpio = require('pigpio');
 	const payloadData = getPayloadData(id, button, rollingCode);
-	const waveform = getWaveform(payloadData, 4);
+	const waveform = getWaveform(payloadData, 2);
 	
 	const output = new pigpio.Gpio(outPin, {mode: pigpio.Gpio.OUTPUT});
 

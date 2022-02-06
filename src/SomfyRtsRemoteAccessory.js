@@ -118,7 +118,8 @@ import { doWhileStatement } from '@babel/types';
 
 		this.log.debug(`Get current position for ${this.config.id} - ${state}`);
 
-		return state ? 100 : 1;
+		// 0 = CLOSED; 100 = OPEN
+		return state ? 0 : 100;
 	}
 
 	/**
@@ -146,8 +147,8 @@ import { doWhileStatement } from '@babel/types';
 	 * so that 100 = ON and 1 = OFF
 	 */
 	async setTargetPosition(value) {
-		// Convert 100 to TRUE; < 100 to FALSE
-		let realValue = value >= 100 ? true : false;
+		// 0 = CLOSED; 100 = OPEN
+		let realValue = value > 0 ? false : true;
 
 		/*
 			Work out what button we need to press based on the current position
