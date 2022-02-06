@@ -22,89 +22,185 @@ import { doWhileStatement } from '@babel/types';
 		this.log = log;
 		this.config = config;
 		this.api = api;
-
-		const Service = this.api.hap.Service;
-		const Characteristic = this.api.hap.Characteristic;
+		this.Service = this.api.hap.Service;
+		this.Characteristic = this.api.hap.Characteristic;
 
 		// Delay to reset the switch after being pressed
 		this.delay = 1000;
 
-		// Decide what buttons the user should get
-		let buttons = this.config.adminMode ? ['Toggle', 'Up', 'Down', 'My', 'Prog'] : ['Toggle'];
+		// Switch services that will be exposed
+		this.switchServices = {};
 
-		// Create Switches
-        this.switchServices = {};
+		// If we are in admin mode then we display everything as stateless switches
+		// that model button presses.
+		if (this.config.adminMode) {
+			this.registerAdminModeSwitches();
+		}
+		
+		// Also show the stateful accessory that represents the blind.
+		this.registerWindowCovering();
+	}
 
+	/**
+	 * Helper function of constructor. If called adds switch devices
+	 * representing 'Up', 'Down', 'My', 'Prog'.
+	 * 
+	 * These are stateless accessories that represent the options on the remote
+	 */
+	registerAdminModeSwitches() {
+		let buttons = ['Up', 'Down', 'My', 'Prog'];
+		
 		buttons.forEach(button => {
-			const buttonName = button == 'Toggle' ? this.config.name : `${this.config.name} ${button}`;
+			const buttonName = `${this.config.name} ${button}`;
 			
-			let service = new Service.Switch(buttonName, button);
+			let service = new this.Service.Switch(buttonName, button);
 			
 			// Bind functions to manage events
-			service.getCharacteristic(Characteristic.On)
-					.onGet(this.getOn.bind(this, button))
-					.onSet(this.setOn.bind(this, button));
+			service.getCharacteristic(this.Characteristic.On)
+					.onGet(this.getButtonOn.bind(this, button))
+					.onSet(this.setButtonOn.bind(this, button));
 
-            this.switchServices[button] = service;
+			this.switchServices[button] = service;
 		});
 
 		// Set default states to off
 		this.states = Object.fromEntries(buttons.map(button => [button,false]));
 
-		// Log success
-		this.log.debug(`Initialized accessory ${this.config.name}`);
+		this.log.debug(`Initialized accessory ${this.config.name} in Admin Mode`);
 	}
 
 	/**
-	 * Getter for the 'On' characteristic of the 'Switch' service
+	 * Helper service for the window covering accessory. This is a stateful
+	 * accessory that uses a JSON file stored locally to persist the
+	 * operational state of the covering.
+	 */
+	registerWindowCovering() {
+		let service = new this.Service.WindowCovering(this.config.name);
+
+		// Current Position
+		service.getCharacteristic(this.Characteristic.CurrentPosition)
+			.onGet(this.getCurrentPosition.bind(this))
+			.setProps({
+				minValue: 1,
+				maxValue: 100,
+				minStep: 100
+			});
+
+		// Position State
+		service.getCharacteristic(this.Characteristic.PositionState)
+			.onGet(this.getPositionState.bind(this));
+
+		// Target Position
+		service.getCharacteristic(this.Characteristic.TargetPosition)
+			.onGet(this.getTargetPosition.bind(this))
+			.onSet(this.setTargetPosition.bind(this))
+			.setProps({
+				minValue: 1,
+				maxValue: 100,
+				minStep: 100
+			});
+
+		this.switchServices['Toggle'] = service;
+
+		// Log success
+		this.log.debug(`Initialized accessory ${this.config.name} in normal mode`);
+	}
+
+	/**
+	 * Returns the current position of the blind. Since partial covering
+	 * is not supported. It is either 100 (ON) or 1 (OFF)
+	 *
+	 * @returns Integer 100 = ON; 1 = OFF
+	 */
+	async getCurrentPosition() {
+		// Read the state from a file
+		const state = BlindState.getOn(this.config.id);
+
+		this.log.debug(`Get current position for ${this.config.id} - ${state}`);
+
+		return state ? 100 : 1;
+	}
+
+	/**
+	 * Not tracking increasing or decreasing for the moment. Just represent
+	 * as being stopped
+	 * 
+	 * @returns Characteristic.PositionState.STOPPED
+	 */
+	async getPositionState() {
+		return this.api.hap.Characteristic.PositionState.STOPPED;
+	}
+
+	/**
+	 * Gets the position that the blind is currently moving to. In our case this is always
+	 * just the current position.
+	 *
+	 * @returns Integer 100 = ON; 1 = OFF
+	 */
+	async getTargetPosition() {
+		return this.getCurrentPosition();
+	}
+
+	/**
+	 * Sets the target position of the blinds. Converts the position
+	 * so that 100 = ON and 1 = OFF
+	 */
+	async setTargetPosition(value) {
+		// Convert 100 to TRUE; < 100 to FALSE
+		let realValue = value >= 100 ? true : false;
+
+		/*
+			Work out what button we need to press based on the current position
+
+			Value    Invert
+			true     false     = Down
+			true     true      = Up
+			false    false     = Up
+			false    true      = Down
+		*/
+		let button = this.config.invertToggle ^ realValue ? 'Down' : 'Up';
+
+		// Press button
+		this.sendCommand(button);
+
+		// Persist the change to the file
+		BlindState.setOn(this.config.id, realValue);
+
+        // Log
+		this.log.debug(`Triggered SET for ${this.config.id} - ${value}`);
+	}
+
+	/**
+	 * Getter for the 'On' characteristic of the buttons when in Admin mode
 	 *
 	 * @method getOn
-	 * @param {String} button - 'Toggle', 'Up', 'Down', 'My', 'Prog'
+	 * @param {String} button - 'Up', 'Down', 'My', 'Prog'
 	*/
-	async getOn(button) {
-		if (button == 'Toggle') {
-			// For the toggle button let's read the state from a file
-			const state = BlindState.getOn(this.config.id);
-	
-			this.log.debug(`Get 'Toggle' for ${this.config.id} - ${state}`);
+	async getButtonOn(button) {
+		this.log.debug(`Get '${button}' for ${this.config.id} - ${this.states[button]}`);
 
-			return state;
-		}
-		else {
-            this.log.debug(`Get '${button}' for ${this.config.id} - ${this.states[button]}`);
-
-			// For other buttons we use the internal array
-			return this.states[button];
-		}
+		// Use the internal array that contains the position
+		return this.states[button];
 	}
 	
 	/**
-	 * Setter for the 'On' characteristic of the 'Switch' service
+	 * Setter for the 'On' characteristic of the buttons when in Admin mode
 	 *
 	 * @method setOn
-	 * @param {String} button - 'Toggle', 'Up', 'Down', 'My', 'Prog'
+	 * @param {String} button - 'Up', 'Down', 'My', 'Prog'
 	 * @param {Object} value - The value for the characteristic
 	*/
-	async setOn(button, value) {
+	async setButtonOn(button, value) {
 		this.log.debug(`Function setOn called for button ${button} with value ${value}`);
 
-		this.sendCommand(button, value);
+		this.sendCommand(button);
 
-		if (button == 'Toggle') {
-			// For the Toggle button we persist the change to the file
-			BlindState.setOn(this.config.id, value);
+		// Update current state to on
+		this.states[button] = value;
 
-            // Log
-			this.log.debug(`Triggered SET for ${this.config.id} - ${value}`);
-		}
-		else {
-			// For other buttons we change the internal state and set a timer to change it back
-			// in X ms
-			this.states[button] = value;
-
-			if (value === true) {
-				this.resetSwitchWithTimeout(button);
-			}
+		// After a few seconds switch the state back off again
+		if (value === true) {
+			this.resetSwitchWithTimeout(button);
 		}
 	}
 
@@ -139,21 +235,9 @@ import { doWhileStatement } from '@babel/types';
     /**
      * Send a command to the device
      */
-    sendCommand(button, value) {
+    sendCommand(button) {
 		// Get current rolling code
 		const rollingCode = BlindState.getRollingCode(this.config.id);
-
-		// Switch toggle into a real direction
-		if (button == 'Toggle') {
-			/*
-			 	Value    Invert
-				true     false     = Down
-				true     true      = Up
-				false    false     = Up
-				false    true      = Down
-			*/
-			button = this.config.invertToggle ^ value ? 'Down' : 'Up';
-		}
 
         // Emit command
 		console.log(`${this.config.id}, ${RpiGpioRts.BUTTON[button]}, ${rollingCode}`);

@@ -55,6 +55,46 @@ class SwitchServiceMock {
     }
 }
 
+// Mock window covering
+class WindowCoveringMock {
+    constructor(buttonName) {
+        this.buttonName = buttonName;
+        this.methods = [];
+    }
+
+    getCharacteristic(characteristic) {
+        return this;
+    }
+
+    updateCharacteristic(characteristic, value) {
+        return this;
+    }
+
+    onGet(f) {
+        this.getMethod = f;
+
+        return this;
+    }
+
+    setProps(props) {
+        return this;
+    }
+
+    onSet(f) {
+        this.setMethod = f;
+
+        return this;
+    }
+
+    get() {
+        return this.getMethod();
+    }
+
+    set(value) {
+        return this.setMethod(value);
+    }
+}
+
 // Mock the API for Homebridge
 const api = {
     "hap": {
@@ -62,7 +102,8 @@ const api = {
             "On": 1
         },
         "Service": {
-            "Switch": SwitchServiceMock
+            "Switch": SwitchServiceMock,
+            "WindowCovering": WindowCoveringMock
         }
     }
 };
@@ -157,17 +198,17 @@ describe("Testing Main Class", () => {
         let services = rts.getServices();
 
         // Close blind
-        services[0].set(true);
+        services[0].set(100);
 
         services[0].get().then(data => {
-            expect(data).toEqual(true);
+            expect(data).toEqual(100);
         });
 
         // Open blind
-        services[0].set(false);
+        services[0].set(1);
 
         services[0].get().then(data => {
-            expect(data).toEqual(false);
+            expect(data).toEqual(1);
         });
 
         // Check the rolling code has been advanced by 2
