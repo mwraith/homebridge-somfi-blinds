@@ -26,10 +26,10 @@ export const BUTTON = {
  * @param {String} button - The button pressed: Up, Down, My, Prog
  * @return {Array} - An array containing the services
 */
-export function sendCommand(id, button, rollingCode) {
+export function sendCommand(id, button, rollingCode, repetitions) {
 	const pigpio = require('pigpio');
 	const payloadData = getPayloadData(id, button, rollingCode);
-	const waveform = getWaveform(payloadData, 2);
+	const waveform = getWaveform(payloadData, repetitions);
 	
 	const output = new pigpio.Gpio(outPin, {mode: pigpio.Gpio.OUTPUT});
 

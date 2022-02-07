@@ -1,5 +1,5 @@
 import SomfyRtsRemoteAccessory from '../SomfyRtsRemoteAccessory.js';
-import * as BlindState from '../BlindState.js';
+import { api, log } from 'homebridge';
 
 // Mock the file system methods
 jest.mock('fs');
@@ -7,109 +7,11 @@ jest.mock('fs');
 // Mock the PiGpio methods
 jest.mock('pigpio');
 
-// Need to mock timers for the admin buttons that switch off after X ms
-jest.useFakeTimers();
-jest.spyOn(global, 'setTimeout');
-
-const LOGGING_ON = false;
-
-// Mock the Logger for Homebridge
-const log = {
-    debug: function(text) { if (LOGGING_ON) console.log(text); }
-}
-
-// A mock Switch accessory
-class SwitchServiceMock {
-    constructor(buttonName, button) {
-        this.buttonName = buttonName;
-        this.button = button;
-        this.methods = [];
-    }
-
-    getCharacteristic(characteristic) {
-        return this;
-    }
-
-    updateCharacteristic(characteristic, value) {
-        return this;
-    }
-
-    onGet(f) {
-        this.getMethod = f;
-
-        return this;
-    }
-
-    onSet(f) {
-        this.setMethod = f;
-
-        return this;
-    }
-
-    get() {
-        return this.getMethod();
-    }
-
-    set(value) {
-        return this.setMethod(value);
-    }
-}
-
-// Mock window covering
-class WindowCoveringMock {
-    constructor(buttonName) {
-        this.buttonName = buttonName;
-        this.methods = [];
-    }
-
-    getCharacteristic(characteristic) {
-        return this;
-    }
-
-    updateCharacteristic(characteristic, value) {
-        return this;
-    }
-
-    onGet(f) {
-        this.getMethod = f;
-
-        return this;
-    }
-
-    setProps(props) {
-        return this;
-    }
-
-    onSet(f) {
-        this.setMethod = f;
-
-        return this;
-    }
-
-    get() {
-        return this.getMethod();
-    }
-
-    set(value) {
-        return this.setMethod(value);
-    }
-}
-
-// Mock the API for Homebridge
-const api = {
-    "hap": {
-        "Characteristic": {
-            "On": 1
-        },
-        "Service": {
-            "Switch": SwitchServiceMock,
-            "WindowCovering": WindowCoveringMock
-        }
-    }
-};
+// Mock homebridge api & logger
+jest.mock('homebridge');
 
 describe("Testing Main Class", () => {
-    test("check services with admin mode", () => {
+    test("Check services with admin mode", () => {
         // Config for the accessory
         const config = {
             "id": 99100,
@@ -137,105 +39,7 @@ describe("Testing Main Class", () => {
         let rts = new SomfyRtsRemoteAccessory(log, config, api);
         let services = rts.getServices();
 
-        // Check we have Toggle only
+        // Check we have the main service only
         expect(services.length).toEqual(1);
-    });
-
-    test("check admin buttons", () => {
-        // Config for the accessory
-        const config = {
-            "id": 99102,
-            "name": "test",
-            "adminMode": true
-        };
-
-        // Create the accessory
-        let rts = new SomfyRtsRemoteAccessory(log, config, api);
-        let services = rts.getServices();
-
-        // Toggle all of the admin buttons
-        services.forEach(s => {
-            if (s.buttonName != 'Toggle') {
-                s.set(true);
-            }
-        });
-
-        // Get all of the admin button states. Should be on
-        services.forEach(s => {
-            if (s.button != 'Toggle') {
-                s.get().then(data => {
-                    //expect(data).toEqual(true);
-                });
-            }
-        });
-
-        // Fast-forward until all timers have been executed
-        jest.runAllTimers();
-
-        if (LOGGING_ON)
-            console.log('Post timer tests');
-
-        // Try all of the admin button states again. Should be off
-        services.forEach(s => {
-            if (s.button != 'Toggle') {
-                s.get().then(data => {
-                    //expect(data).toEqual(false);
-                });
-            }
-        });
-    });
-
-    test("check toggle button", () => {
-        // Config for the accessory
-        const config = {
-            "id": 99103,
-            "name": "test",
-            "adminMode": false
-        };
-
-        // Create the accessory
-        let rts = new SomfyRtsRemoteAccessory(log, config, api);
-        let services = rts.getServices();
-
-        // Close blind
-        services[0].set(100);
-
-        services[0].get().then(data => {
-            expect(data).toEqual(100);
-        });
-
-        // Open blind
-        services[0].set(0);
-
-        services[0].get().then(data => {
-            expect(data).toEqual(0);
-        });
-
-        // Check the rolling code has been advanced by 2
-        const code = BlindState.getRollingCode(config.id);
-        expect(code).toEqual(3);
-    });
-
-    test("check that admin buttons only advance code by 1", () => {
-        // Config for the accessory
-        const config = {
-            "id": 99104,
-            "name": "test",
-            "adminMode": true
-        };
-
-        // Create the accessory
-        let rts = new SomfyRtsRemoteAccessory(log, config, api);
-        let services = rts.getServices();
-
-        // Trigger admin buttons
-        services[1].set(true);
-        
-        // Fast-forward until all timers have been executed
-        jest.runAllTimers();
-
-        // Expect code to be 2
-        const code = BlindState.getRollingCode(config.id);
-        expect(code).toEqual(2);
     });
 });
