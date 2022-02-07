@@ -92,7 +92,7 @@ export default class WindowCoveringAccessory {
 			// Ensure it hasn't gone over 100
 			percentComplete = percentComplete > 100 ? 100 : percentComplete;
 
-			this.log.debug(`Get current position for ${this.config.id} - ${state} from mocked value`);
+			this.log.debug(`Getting current position for ${this.config.id} - ${percentComplete} from mocked value`);
 			
 			// The percentage complete can just be returned if the blind 
 			// is moving to position 100. If it's moving to 0, invert it.
@@ -104,6 +104,8 @@ export default class WindowCoveringAccessory {
 			}
 		}
 		else {
+			this.log.debug(`Getting current position from file`);
+
 			// Otherwise the current position is the same as the target position
 			return this.getTargetPosition();
 		}
