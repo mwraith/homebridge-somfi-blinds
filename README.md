@@ -4,7 +4,7 @@ A [Homebridge](https://github.com/homebridge/homebridge) plugin to add HomeKit c
 
 | Advantages | Limitations |
 | ---------- | ----------- |
-| <ul><li>Cheap: should be under 10 €, or under 40 € in total with a Raspberry Pi Zero WH and accessories included</li><li>Up to 150 Somfy RTS devices controlled simultaneously (HomeKit limit per bridge)</li><li>Self sufficient: pairing with Somfy RTS devices can be performed directly in Homebridge or Apple Home App with the Prog button</li><li>Once configured the device appears as only a single On/Off switch in Apple Home</li></ul> | <ul><li>Requires a bit of hacking with the hardware and software</li><li>Requires to give root privilege to Homebridge</li><li>Due to limitations with Somfy RTS, the state is purely cached in Homebridge and not received from the device. If you use the physical remote it will get out of sync</li><li>State is either Open or Closed and does not support partial opening</li><li>Personal project without any guarantee of updates and support</li></ul> |
+| <ul><li>Cheap: should be under 10 €, or under 40 € in total with a Raspberry Pi Zero WH and accessories included</li><li>Up to 150 Somfy RTS devices controlled simultaneously (HomeKit limit per bridge)</li><li>Self sufficient: pairing with Somfy RTS devices can be performed directly in Homebridge or Apple Home App with the Prog button</li><li>Once configured the device appears as only a single window covering accessory in Apple Home</li></ul> | <ul><li>Requires a bit of hacking with the hardware and software</li><li>Requires to give root privilege to Homebridge</li><li>Due to limitations with Somfy RTS, the state is purely cached in Homebridge and not received from the device. If you use the physical remote it will get out of sync</li><li>State is either Open or Closed and does not support partial opening</li><li>Personal project without any guarantee of updates and support</li></ul> |
 
 ## Hardware Setup
 Somfy RTS uses a frequency of 433.42 MHz instead of the usual 433.92 MHz, which requires to replace the resonator to increase the range of the transmitter. The range is typically less than 3 meters at 433.92 MHz and more than 20 meters at 433.42 MHz with a 17 cm antenna (quarter wavelength).
@@ -143,7 +143,8 @@ Alternatively, edit the JSON config file and add the following block inside the 
     "name": "XXXXX",
     "id": 12345,
     "adminMode": true,
-    "invertToggle": false
+    "invertToggle": false,
+    "repetitions": 4
 }
 ```
 Where:
@@ -152,6 +153,7 @@ Where:
 - `id` is the unique ID of the virtual Somfy RTS remote to choose between 0 and 16777216 (required)
 - `adminMode` when sets to true shows four stateless buttons (Up, Down, My, Prog) and when false shows only a single On/Off button
 - `invertToggle` is used for blinds that extend upwards where the Up command actually closes the blind
+- `repetitions` is an optional parameter that states how many times the signal should be sent (Default = 4)
 
 
 ### Pairing
@@ -168,7 +170,7 @@ For each virtual remote created:
 5. Wait at least 5 minutes before pairing another remote to avoid pairing a remote to multiple devices.
 
 ### Post Setup
-Once pairing is complete, you can switch the controls to a single stateful On/Off button. Go to Homebridge Config UI X, then in the Config tab, edit the JSON to set the `adminMode` to false. Restart homebridge.
+Once pairing is complete, you can switch the controls to a single stateful On/Off window covering. Go to Homebridge Config UI X, then in the Config tab, edit the JSON to set the `adminMode` to false. Restart homebridge.
 
 ## Backup
 Any loss of unique IDs and/or rolling codes, leads to the impossibility to control the Somfy RTS devices.
@@ -194,6 +196,8 @@ Rolling codes are stored in text files in the Homebridge storage path with the u
 - Error `Can't lock /var/run/pigpio.pid`: stop current pigpio daemon instance: `sudo killall pigpiod`.
 
 If it does not solve the problem, please open an issue in GitHub with as much information on the environment and error as possible (Raspberry Pi model, Node.js version, Homebridge version, ...)
+
+- Blind only moves a small step instead of fully opening/closing. The blind is detecting the signal as a long-press. Change your config file and lower the repetitions parameter to 2.
 
 ## Links
 - [homebridge-rpi-rts](https://github.com/wibberryd/homebridge-rpi-rts/blob/master/README.md) from which this plugin was originally based.
