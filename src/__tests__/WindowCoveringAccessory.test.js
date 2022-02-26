@@ -52,7 +52,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be UP
         expect(spy).toHaveBeenCalledWith(
-            expect.anything(),
+            expect.objectContaining(config),
             'Up'
         );
 
@@ -69,7 +69,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be DOWN
         expect(spy).toHaveBeenCalledWith(
-            expect.anything(),
+            expect.objectContaining(config),
             'Down'
         );
 
@@ -103,7 +103,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be MY
         expect(spy).toHaveBeenCalledWith(
-            expect.anything(),
+            expect.objectContaining(config),
             'My'
         );
 
@@ -120,7 +120,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be DOWN
         expect(spy).toHaveBeenCalledWith(
-            expect.anything(),
+            expect.objectContaining(config),
             'Down'
         );
 
