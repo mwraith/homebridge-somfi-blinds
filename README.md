@@ -144,7 +144,8 @@ Alternatively, edit the JSON config file and add the following block inside the 
     "id": 12345,
     "adminMode": true,
     "invertToggle": false,
-    "repetitions": 4
+    "repetitions": 4,
+    "openToMyPosition": false
 }
 ```
 Where:
@@ -153,7 +154,8 @@ Where:
 - `id` is the unique ID of the virtual Somfy RTS remote to choose between 0 and 16777216 (required)
 - `adminMode` when sets to true shows four stateless buttons (Up, Down, My, Prog) and when false shows only a single On/Off button
 - `invertToggle` is used for blinds that extend upwards where the Up command actually closes the blind
-- `repetitions` is an optional parameter that states how many times the signal should be sent (Default = 4)
+- `repetitions` is an optional parameter that states how many times the signal should be sent. Sending multiple times may improve reception, however if the number is too large some blinds may detect it as a long button press, which only moves the blinds one step (Default = 4)
+- `openToMyPosition` should be enabled for venetian blinds or other window coverings that should be opened to a partial position. It sends a MY button press when open is set as target position
 
 
 ### Pairing

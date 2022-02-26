@@ -32,6 +32,12 @@
 				"description": "Used for blinds that go up",
 				"type": "boolean",
 				"default": false
+			},
+			"openToMyPosition": {
+				"title": "Open to My Position",
+				"description": "Sends MY button to open blinds in pre-set position",
+				"type": "boolean",
+				"default": false
 			}
 		}
 	}

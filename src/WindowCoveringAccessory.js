@@ -131,16 +131,33 @@ export default class WindowCoveringAccessory {
 		// 100 = OPEN (state = false)
 		let internalState = value > 0 ? false : true;
 
-		/*
-			Work out what button we need to press based on the current position
-
-			Value    Invert
-			true     false     = Down
-			true     true      = Up
-			false    false     = Up
-			false    true      = Down
-		*/
-		let button = this.config.invertToggle ^ internalState ? 'Down' : 'Up';
+		// Work out what button we need to press based on the current position and
+		// whether the blinds should open to My Position instead of fully open
+		// (e.g. for venetian blinds MY is used to set partial tilt)
+		let button;
+		
+		if (this.config.openToMyPosition) {
+			/*
+				Target State    Invert
+				true (CLOSED)   false     = Down
+				true (CLOSED)   true      = Up
+				false (OPEN)    false     = My
+				false (OPEN)    true      = My
+			*/
+			button = internalState ? 'My'
+				   : this.config.invertToggle ? 'Up'
+				   : 'Down';
+		}
+		else {
+			/*
+				Target State    Invert
+				true (CLOSED)   false     = Down
+				true (CLOSED)   true      = Up
+				false (OPEN)    false     = Up
+				false (OPEN)    true      = Down
+			*/
+			button = this.config.invertToggle ^ internalState ? 'Down' : 'Up';
+		}
 
 		// Send button press to RpiGpioRts
 		sendCommand(this.config, button);

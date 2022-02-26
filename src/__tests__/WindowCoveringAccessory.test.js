@@ -65,4 +65,40 @@ describe("Testing Window Covering Accessory", () => {
             expect(data).toEqual(0);
         });
     });
+
+
+    test("Check My Position Mode", () => {
+        // Config for the accessory
+        const config = {
+            "id": 99204,
+            "name": "Test",
+            "adminMode": true,
+            "openToMyPosition": true
+        };
+
+        // Create the accessory
+        let service = new WindowCoveringAccessory('Test', log, config, api);
+
+        // Fully open the blind
+        service.set(100);
+
+        // Wait a while
+        jest.runAllTimers();
+
+        // Expect to be open
+        service.get().then(data => {
+            expect(data).toEqual(100);
+        });
+
+        // Fully close the blind
+        service.set(0);
+
+        // Wait a while
+        jest.runAllTimers();
+
+        // Expect to be closed
+        service.get().then(data => {
+            expect(data).toEqual(0);
+        });
+    });
 });
