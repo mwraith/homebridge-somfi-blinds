@@ -144,7 +144,7 @@ export default class WindowCoveringAccessory {
 				false (OPEN)    false     = My
 				false (OPEN)    true      = My
 			*/
-			button = internalState ? 'My'
+			button = !internalState ? 'My'
 				   : this.config.invertToggle ? 'Up'
 				   : 'Down';
 		}

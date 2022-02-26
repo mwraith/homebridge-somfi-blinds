@@ -1,5 +1,6 @@
 import WindowCoveringAccessory from '../WindowCoveringAccessory.js';
 import { api, log } from 'homebridge';
+import * as SendCommandMethods from '../SendCommand.js';
 
 // Mock the file system methods
 jest.mock('fs');
@@ -40,11 +41,20 @@ describe("Testing Window Covering Accessory", () => {
             "adminMode": true
         };
 
+        // Spy on calls to send command
+        const spy = jest.spyOn(SendCommandMethods, 'sendCommand');
+
         // Create the accessory
         let service = new WindowCoveringAccessory('Test', log, config, api);
 
         // Fully open the blind
         service.set(100);
+
+        // Expect button pressed to be UP
+        expect(spy).toHaveBeenCalledWith(
+            expect.anything(),
+            'Up'
+        );
 
         // Wait a while
         jest.runAllTimers();
@@ -56,6 +66,12 @@ describe("Testing Window Covering Accessory", () => {
 
         // Fully close the blind
         service.set(0);
+
+        // Expect button pressed to be DOWN
+        expect(spy).toHaveBeenCalledWith(
+            expect.anything(),
+            'Down'
+        );
 
         // Wait a while
         jest.runAllTimers();
@@ -76,11 +92,20 @@ describe("Testing Window Covering Accessory", () => {
             "openToMyPosition": true
         };
 
+        // Spy on calls to send command
+        const spy = jest.spyOn(SendCommandMethods, 'sendCommand');
+
         // Create the accessory
         let service = new WindowCoveringAccessory('Test', log, config, api);
 
         // Fully open the blind
         service.set(100);
+
+        // Expect button pressed to be MY
+        expect(spy).toHaveBeenCalledWith(
+            expect.anything(),
+            'My'
+        );
 
         // Wait a while
         jest.runAllTimers();
@@ -92,6 +117,12 @@ describe("Testing Window Covering Accessory", () => {
 
         // Fully close the blind
         service.set(0);
+
+        // Expect button pressed to be DOWN
+        expect(spy).toHaveBeenCalledWith(
+            expect.anything(),
+            'Down'
+        );
 
         // Wait a while
         jest.runAllTimers();
