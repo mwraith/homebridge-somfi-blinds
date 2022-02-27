@@ -15,6 +15,7 @@ jest.mock('homebridge');
 jest.useFakeTimers();
 jest.spyOn(global, 'setTimeout');
 
+const Characteristic = api.hap.Characteristic;
 
 describe("Testing Window Covering Accessory", () => {
 
@@ -46,9 +47,12 @@ describe("Testing Window Covering Accessory", () => {
 
         // Create the accessory
         let service = new WindowCoveringAccessory('Test', log, config, api);
+        let TargetPosition = service.getCharacteristic(Characteristic.TargetPosition);
+        let CurrentPosition = service.getCharacteristic(Characteristic.CurrentPosition);
+        let PositionState = service.getCharacteristic(Characteristic.PositionState);
 
         // Fully open the blind
-        service.set(100);
+        TargetPosition.set(100);
 
         // Expect button pressed to be UP
         expect(spy).toHaveBeenCalledWith(
@@ -59,13 +63,19 @@ describe("Testing Window Covering Accessory", () => {
         // Wait a while
         jest.runAllTimers();
 
-        // Expect to be open
-        service.get().then(data => {
+        // Expect position to be open
+        TargetPosition.get().then(data => {
             expect(data).toEqual(100);
+        });
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(100);
+        });
+        PositionState.get().then(data => {
+            expect(data).toEqual(Characteristic.PositionState.STOPPED);
         });
 
         // Fully close the blind
-        service.set(0);
+        TargetPosition.set(0);
 
         // Expect button pressed to be DOWN
         expect(spy).toHaveBeenCalledWith(
@@ -77,11 +87,16 @@ describe("Testing Window Covering Accessory", () => {
         jest.runAllTimers();
 
         // Expect to be closed
-        service.get().then(data => {
+        TargetPosition.get().then(data => {
             expect(data).toEqual(0);
         });
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(0);
+        });
+        PositionState.get().then(data => {
+            expect(data).toEqual(Characteristic.PositionState.STOPPED);
+        });
     });
-
 
     test("Check My Position Mode", () => {
         // Config for the accessory
@@ -97,9 +112,12 @@ describe("Testing Window Covering Accessory", () => {
 
         // Create the accessory
         let service = new WindowCoveringAccessory('Test', log, config, api);
+        let TargetPosition = service.getCharacteristic(Characteristic.TargetPosition);
+        let CurrentPosition = service.getCharacteristic(Characteristic.CurrentPosition);
+        let PositionState = service.getCharacteristic(Characteristic.PositionState);
 
         // Fully open the blind
-        service.set(100);
+        TargetPosition.set(100);
 
         // Expect button pressed to be MY
         expect(spy).toHaveBeenCalledWith(
@@ -111,12 +129,18 @@ describe("Testing Window Covering Accessory", () => {
         jest.runAllTimers();
 
         // Expect to be open
-        service.get().then(data => {
+        TargetPosition.get().then(data => {
             expect(data).toEqual(100);
+        });
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(100);
+        });
+        PositionState.get().then(data => {
+            expect(data).toEqual(Characteristic.PositionState.STOPPED);
         });
 
         // Fully close the blind
-        service.set(0);
+        TargetPosition.set(0);
 
         // Expect button pressed to be DOWN
         expect(spy).toHaveBeenCalledWith(
@@ -128,8 +152,72 @@ describe("Testing Window Covering Accessory", () => {
         jest.runAllTimers();
 
         // Expect to be closed
-        service.get().then(data => {
+        TargetPosition.get().then(data => {
             expect(data).toEqual(0);
+        });
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(0);
+        });
+        PositionState.get().then(data => {
+            expect(data).toEqual(Characteristic.PositionState.STOPPED);
+        });
+    });
+
+
+    test("Test current position works", () => {
+        // Config for the accessory
+        const config = {
+            "id": 99205,
+            "name": "Test",
+            "adminMode": false,
+            "openToMyPosition": false,
+            "blindOpenDelay": 10000
+        };
+
+        // Create the accessory
+        let service = new WindowCoveringAccessory('Test', log, config, api);
+        let TargetPosition = service.getCharacteristic(Characteristic.TargetPosition);
+        let CurrentPosition = service.getCharacteristic(Characteristic.CurrentPosition);
+
+        // Fully open the blind
+        TargetPosition.set(100);
+
+        // Wait a while
+        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+
+        // Expect current position to be 30% open
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(30);
+        });
+
+        // Wait a while
+        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+
+        // Expect current position to be 60% open
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(60);
+        });
+
+        // Finish opening
+        jest.runAllTimers();
+
+        // Fully close the blind
+        TargetPosition.set(0);
+
+        // Wait a while
+        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+
+        // Expect current position to be 30% closed
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(70);
+        });
+
+        // Wait a while longer
+        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+
+        // Expect current position to be 60% closed
+        CurrentPosition.get().then(data => {
+            expect(data).toEqual(40);
         });
     });
 });

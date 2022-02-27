@@ -38,7 +38,7 @@ export default class WindowCoveringAccessory {
 		this.api = api;
 
         // Time for the blind to open/close in milliseconds (mocked)
-        this.delay = this.config.blindOpenDelay || 5000;
+        this.delay = this.config.blindOpenDelay || 10000;
 
         // Register a switch service
         this.service = new this.api.hap.Service.WindowCovering(this.config.name);
@@ -80,46 +80,18 @@ export default class WindowCoveringAccessory {
 	 * @returns Integer 100 = ON; 1 = OFF
 	 */
     async getCurrentPosition() {
-		// Decide whether to get the current position from the mocked state or from
-		// the BlindState file. The mocked state is just used for a few seconds after 
-		// changing to give a better visual appearance in Home Kit
-		if (this.isBlindCurrentlyMoving()) {
-			let percentComplete = (Date.now() - this.lastChange.timestamp) / this.delay;
+		// Get the current position from the cache if it's there, otherwise take
+		// the target position as being current.
+		if (this.currentState) {
+			this.log.debug(`Getting current position from state: ${this.currentState.currentPosition}`);
 
-			// Round to integer
-			percentComplete = Math.round(percentComplete);
-
-			// Ensure it hasn't gone over 100
-			percentComplete = percentComplete > 100 ? 100 : percentComplete;
-
-			this.log.debug(`Getting current position for ${this.config.id} - ${percentComplete} from mocked value`);
-			
-			// The percentage complete can just be returned if the blind 
-			// is moving to position 100. If it's moving to 0, invert it.
-			if (this.lastChange.value == 100) {
-				return percentComplete;
-			}
-			else {
-				return 100 - percentComplete;
-			}
+			return this.currentState.currentPosition;
 		}
 		else {
 			this.log.debug(`Getting current position from file`);
 
-			// Otherwise the current position is the same as the target position
 			return this.getTargetPosition();
 		}
-	}
-
-	/**
-	 * Uses the 'mocked' timestamp to understand if the blind is currently moving. If
-	 * so the state is taken from the mock values rather than the BlindState to give
-	 * the appearance of moving.
-	 * 
-	 * @returns {Boolean} TRUE if blind is currently moving; FALSE otherwise
-	 */
-	isBlindCurrentlyMoving() {
-		return this.lastChange.timestamp && (Date.now() - this.lastChange.timestamp) < this.delay;
 	}
 
 	/**
@@ -165,16 +137,52 @@ export default class WindowCoveringAccessory {
 		// Persist the change to the file
 		BlindState.setOn(this.config.id, internalState);
 
-		// Track the request, which is used by getPositionState, getCurrentPosition
-		// and getTargetPosition
-		this.lastChange = {
-			'timestamp': Date.now(),
-			'button': button,
-			'targetValue': value
+		// Set current state
+		const PositionState = this.api.hap.Characteristic.PositionState;
+
+		this.currentState = {
+			'positionState': value > 0 ? PositionState.INCREASING : PositionState.DECREASING,
+			'targetPosition': value,
+			'currentPosition': value > 0 ? 0 : 100
 		};
+
+		// Advance the current state by 5%. The delay represents the total time
+		// to move the blind, so divide by 20 to give the interval frequency.
+		this.interval = setInterval(this.advanceCurrentPosition.bind(this),
+									Math.round(this.delay / 20),
+									value == 100 ? 5 : -5);
 
         // Log
 		this.log.debug(`Triggered SET for ${this.config.id} - ${value}`);
+	}
+
+	/**
+	 * Advances the position of the blind by a given percentage. Used to mock
+	 * the current position of the blind.
+	 * 
+	 * @param {Integer} increment The percentage to increase the position
+	 */
+	advanceCurrentPosition(increment) {
+		const PositionState = this.api.hap.Characteristic.PositionState;
+
+		// Advance current position
+		this.currentState.currentPosition += increment;
+
+		// Update homebridge of the new position
+		this.service.getCharacteristic(this.api.hap.Characteristic.CurrentPosition)
+			.updateValue(this.currentState.currentPosition);
+		
+		// Check if the position is now stopped
+		if (this.currentState.currentPosition <= 0 || this.currentState.currentPosition >= 100) {
+			this.currentState.positionState = PositionState.STOPPED;
+
+			// Update homebridge that we are now stopped
+			this.service.getCharacteristic(PositionState)
+				.updateValue(PositionState.STOPPED);
+
+			// Stop the interval from executing
+			clearInterval(this.interval);
+		}
 	}
 
 	/**
@@ -186,10 +194,8 @@ export default class WindowCoveringAccessory {
 	async getPositionState() {
 		const PositionState = this.api.hap.Characteristic.PositionState;
 
-		// If the blind is currently moving then display the direction. Otherwise
-		// show 'STOPPED' as the state
-		if (this.isBlindCurrentlyMoving()) {
-			return this.lastChange.targetValue > 0 ? PositionState.INCREASING : PositionState.DECREASING;
+		if (this.currentState) {
+			return this.currentState.positionState;
 		}
 		else {
 			return PositionState.STOPPED;

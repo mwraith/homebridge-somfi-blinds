@@ -145,7 +145,8 @@ Alternatively, edit the JSON config file and add the following block inside the 
     "adminMode": true,
     "invertToggle": false,
     "repetitions": 4,
-    "openToMyPosition": false
+    "openToMyPosition": false,
+    "blindOpenDelay": 12000
 }
 ```
 Where:
@@ -156,6 +157,7 @@ Where:
 - `invertToggle` is used for blinds that extend upwards where the Up command actually closes the blind
 - `repetitions` is an optional parameter that states how many times the signal should be sent. Sending multiple times may improve reception, however if the number is too large some blinds may detect it as a long button press, which only moves the blinds one step (Default = 4)
 - `openToMyPosition` should be enabled for venetian blinds or other window coverings that should be opened to a partial position. It sends a MY button press when open is set as target position
+- `blindOpenDelay` defines the time in ms that it typically takes for the blind to open or close. Used to mock the current position that is reported. For venetian blinds the recommendation is to lower this number to 2000 or 2s (Default = 10000)
 
 
 ### Pairing

@@ -43,13 +43,13 @@ describe("Testing Button Accessory", () => {
         let service = new ButtonAccessory('Test Up', 'Up', log, config, api);
 
         // Push the button
-        service.set(true)
+        service.getCharacteristic(api.hap.Characteristic.On).set(true)
 
         // Wait a while
         jest.runAllTimers();
 
         // Expect button to be off
-        service.get().then(data => {
+        service.getCharacteristic(api.hap.Characteristic.On).get().then(data => {
             expect(data).toEqual(false);
         });
     });
@@ -66,7 +66,7 @@ describe("Testing Button Accessory", () => {
         let service = new ButtonAccessory('Test Up', 'Up', log, config, api);
 
         // Expect button to be off
-        service.get().then(data => {
+        service.getCharacteristic(api.hap.Characteristic.On).get().then(data => {
             expect(data).toEqual(false);
         });
     });

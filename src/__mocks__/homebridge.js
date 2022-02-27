@@ -1,18 +1,32 @@
 const LOGGING_ON = false;
 
-class SwitchServiceMock {
-    constructor(buttonName, button) {
-        this.buttonName = buttonName;
-        this.button = button;
-        this.methods = [];
+const CHARACTERISTICS = {
+    'On': 'ON',
+    'CurrentPosition': 'CURRENTPOSITION',
+    'TargetPosition': 'TARGETPOSITION',
+    'PositionState': {
+        DECREASING: 'DECREASING',
+        INCREASING: 'INCREASING',
+        STOPPED: 'STOPPED',
+        toString: function() { return 'POSITIONSTATE'; }
     }
+};
 
-    getCharacteristic(characteristic) {
+class MockCharacteristic {
+    updateValue(value) {
+        this.value = value;
+
         return this;
     }
 
-    updateCharacteristic(characteristic, value) {
-        return this;
+    get() {
+        return this.getMethod();
+    }
+
+    set(value) {
+        this.value = value;
+
+        return this.setMethod(value);
     }
 
     onGet(f) {
@@ -27,71 +41,66 @@ class SwitchServiceMock {
         return this;
     }
 
-    get() {
-        return this.getMethod();
+    setProps(props) {
+        this.props = props;
+        
+        return this;
+    }
+}
+
+class SwitchServiceMock {
+    constructor(buttonName, button) {
+        this.buttonName = buttonName;
+        this.button = button;
+
+        this.characteristics = {
+            'ON': new MockCharacteristic()
+        };
     }
 
-    set(value) {
-        return this.setMethod(value);
+    getCharacteristic(characteristic) {
+        return this.characteristics[characteristic];
+    }
+
+    updateCharacteristic(characteristic, value) {
+        return this;
     }
 }
 
 class WindowCoveringMock {
     constructor(buttonName) {
         this.buttonName = buttonName;
-        this.methods = [];
+
+        this.characteristics = {
+            'CURRENTPOSITION': new MockCharacteristic(),
+            'TARGETPOSITION': new MockCharacteristic(),
+            'POSITIONSTATE': new MockCharacteristic()
+        };
     }
 
     getCharacteristic(characteristic) {
-        return this;
+        return this.characteristics[characteristic];
     }
 
     updateCharacteristic(characteristic, value) {
         return this;
     }
-
-    onGet(f) {
-        this.getMethod = f;
-
-        return this;
-    }
-
-    setProps(props) {
-        return this;
-    }
-
-    onSet(f) {
-        this.setMethod = f;
-
-        return this;
-    }
-
-    get() {
-        return this.getMethod();
-    }
-
-    set(value) {
-        return this.setMethod(value);
-    }
 }
-
-// Mock the Logger for Homebridge
-let log = {
-    debug: function(text) { if (LOGGING_ON) console.log(text); }
-}
-
 
 let api = {
     'hap': {
-        'Characteristic': {
-            'On': 1
-        },
+        'Characteristic': CHARACTERISTICS,
         'Service': {
             'Switch': SwitchServiceMock,
             'WindowCovering': WindowCoveringMock
         }
     }
 };
+
+// Mock the Logger for Homebridge
+let log = {
+    debug: function(text) { if (LOGGING_ON) console.log(text); }
+}
 
 export {
     api,
