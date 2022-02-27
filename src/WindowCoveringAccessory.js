@@ -109,6 +109,9 @@ export default class WindowCoveringAccessory {
 			// Update State to STOPPED
 			this.currentState.positionState = PositionState.STOPPED
 
+			// Change Target State to Current State
+			this.currentState.currentPosition = this.currentState.targetPosition;
+
 			// Stop the interval from executing so that current position remains
 			clearInterval(this.interval);
 
