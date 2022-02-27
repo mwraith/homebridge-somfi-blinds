@@ -38,7 +38,7 @@ export default class WindowCoveringAccessory {
 		this.api = api;
 
         // Time for the blind to open/close in milliseconds (mocked)
-        this.delay = this.config.blindOpenDelay || 10000;
+        this.delay = this.config.blindTimeToOpen || 10000;
 
         // Register a switch service
         this.service = new this.api.hap.Service.WindowCovering(this.config.name);
@@ -99,6 +99,22 @@ export default class WindowCoveringAccessory {
 	 * so that 100 = ON and 1 = OFF
 	 */
 	async setTargetPosition(value) {
+		const PositionState = this.api.hap.Characteristic.PositionState;
+
+		// If the blind is already moving send MY button and stop signal
+		if (this.currentState && this.currentState.positionState != PositionState.STOPPED) {
+			// Send My button to stop movement
+			sendCommand(this.config, 'My');
+
+			// Update State to STOPPED
+			this.currentState.positionState = PositionState.STOPPED
+
+			// Stop the interval from executing so that current position remains
+			clearInterval(this.interval);
+
+			return;
+		}
+
 		// 0 = CLOSED (state = true)
 		// 100 = OPEN (state = false)
 		let internalState = value > 0 ? false : true;
@@ -136,9 +152,6 @@ export default class WindowCoveringAccessory {
 
 		// Persist the change to the file
 		BlindState.setOn(this.config.id, internalState);
-
-		// Set current state
-		const PositionState = this.api.hap.Characteristic.PositionState;
 
 		this.currentState = {
 			'positionState': value > 0 ? PositionState.INCREASING : PositionState.DECREASING,

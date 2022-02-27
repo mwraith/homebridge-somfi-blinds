@@ -171,7 +171,7 @@ describe("Testing Window Covering Accessory", () => {
             "name": "Test",
             "adminMode": false,
             "openToMyPosition": false,
-            "blindOpenDelay": 10000
+            "blindTimeToOpen": 10000
         };
 
         // Create the accessory
@@ -183,7 +183,7 @@ describe("Testing Window Covering Accessory", () => {
         TargetPosition.set(100);
 
         // Wait a while
-        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+        jest.advanceTimersByTime(config.blindTimeToOpen*0.3);
 
         // Expect current position to be 30% open
         CurrentPosition.get().then(data => {
@@ -191,7 +191,7 @@ describe("Testing Window Covering Accessory", () => {
         });
 
         // Wait a while
-        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+        jest.advanceTimersByTime(config.blindTimeToOpen*0.3);
 
         // Expect current position to be 60% open
         CurrentPosition.get().then(data => {
@@ -205,7 +205,7 @@ describe("Testing Window Covering Accessory", () => {
         TargetPosition.set(0);
 
         // Wait a while
-        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+        jest.advanceTimersByTime(config.blindTimeToOpen*0.3);
 
         // Expect current position to be 30% closed
         CurrentPosition.get().then(data => {
@@ -213,11 +213,44 @@ describe("Testing Window Covering Accessory", () => {
         });
 
         // Wait a while longer
-        jest.advanceTimersByTime(config.blindOpenDelay*0.3);
+        jest.advanceTimersByTime(config.blindTimeToOpen*0.3);
 
         // Expect current position to be 60% closed
         CurrentPosition.get().then(data => {
             expect(data).toEqual(40);
         });
+    });
+
+    test("Test stopping in partial position", () => {
+        // Config for the accessory
+        const config = {
+            "id": 99206,
+            "name": "Test",
+            "adminMode": false,
+            "openToMyPosition": false,
+            "blindTimeToOpen": 10000
+        };
+
+        // Create the accessory
+        let service = new WindowCoveringAccessory('Test', log, config, api);
+        let TargetPosition = service.getCharacteristic(Characteristic.TargetPosition);
+
+        // Spy on calls to send command
+        const spy = jest.spyOn(SendCommandMethods, 'sendCommand');
+
+        // Fully open the blind
+        TargetPosition.set(100);
+
+        // Wait a while
+        jest.advanceTimersByTime(config.blindTimeToOpen*0.3);
+
+        // Send a closed signal
+        TargetPosition.set(0);
+
+        // Expect button pressed to be MY 
+        expect(spy).toHaveBeenCalledWith(
+            expect.objectContaining(config),
+            'My'
+        );
     });
 });
