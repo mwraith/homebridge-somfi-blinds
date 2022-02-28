@@ -6,7 +6,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "test": "jest",
-    "build": "babel src -d lib"
+    "build": "babel src -d lib --ignore '**/__tests__' --ignore '**/__mocks__'"
   },
   "jest": {
     "testPathIgnorePatterns": [
