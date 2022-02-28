@@ -112,6 +112,13 @@ export default class WindowCoveringAccessory {
 			// Change Target State to Current State
 			this.currentState.currentPosition = this.currentState.targetPosition;
 
+			// Update homebridge of the new position
+			this.service.getCharacteristic(this.api.hap.Characteristic.CurrentPosition)
+				.updateValue(this.currentState.currentPosition);
+
+			this.service.getCharacteristic(PositionState)
+				.updateValue(PositionState.STOPPED);
+
 			// Stop the interval from executing so that current position remains
 			clearInterval(this.interval);
 
