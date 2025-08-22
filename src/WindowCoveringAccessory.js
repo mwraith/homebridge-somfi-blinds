@@ -69,8 +69,6 @@ export default class WindowCoveringAccessory {
 				maxValue: 100,
 				minStep: 100
 			});
-
-        return this.service;
     }
 
 	/**
