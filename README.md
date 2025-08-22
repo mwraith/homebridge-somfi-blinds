@@ -172,7 +172,7 @@ Alternatively, edit your `config.json` and add the following block inside the **
 ```
 
 ### Accessory Configuration (supported for legacy purposes)
-Go to Homebridge Config UI X, go to the Plugins tab, and click on Settings under Homebridge Rpi Rts.
+Go to **Homebridge Config UI**, open the **Plugins** tab, and click **Plugin Config** under *Somfy Blinds Remote*.  
 
 Create as many accessories as needed (e.g. one per device to control). Each accessory is equivalent to a virtual remote. Each accessory must get a unique ID.
 
