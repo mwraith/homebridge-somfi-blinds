@@ -145,7 +145,33 @@ When a device receives a signal it does the following:
 
 A same remote can even be registered on many devices (intentionally or inadvertently), and thus control simultaneoulsy many devices.
 
-### Configuration of the Plugin
+### Platform Configuration (recommended as it supports Child Bridge)
+Go to **Homebridge Config UI**, open the **Plugins** tab, and click **Plugin Config** under *Somfy Blinds Remote*.  
+
+Add your blinds under the **Devices** list. Each device entry is equivalent to a virtual Somfy RTS remote. Each device must have a unique `id`.
+
+Alternatively, edit your `config.json` and add the following block inside the **platforms** array:
+
+```json
+{
+    "platform": "SomfyRtsPlatform",
+    "name": "Somfy RTS",
+    "devices": [
+        {
+            "id": 12345,
+            "name": "Living Room Blind",
+            "adminMode": true
+        },
+        {
+            "id": 67890,
+            "name": "Kitchen Blind",
+            "adminMode": false
+        }
+    ]
+}
+```
+
+### Accessory Configuration (supported for legacy purposes)
 Go to Homebridge Config UI X, go to the Plugins tab, and click on Settings under Homebridge Rpi Rts.
 
 Create as many accessories as needed (e.g. one per device to control). Each accessory is equivalent to a virtual remote. Each accessory must get a unique ID.
@@ -154,16 +180,14 @@ Alternatively, edit the JSON config file and add the following block inside the 
 ```json
 {
     "accessory": "Somfy Blinds",
-    "name": "XXXXX",
+    "name": "Living Room Blind",
     "id": 12345,
     "adminMode": true,
-    "invertToggle": false,
-    "repetitions": 4,
-    "openToMyPosition": false,
-    "blindTimeToOpen": 12000
 }
 ```
-Where:
+
+### Configuration Options
+Configuration settings below are supported for both platform and accessory modes:
 - `accessory` must be "Somfy Blinds" (required)
 - `name` is the name of the accessory as it will appear in HomeKit (required)
 - `id` is the unique ID of the virtual Somfy RTS remote to choose between 0 and 16777216 (required)
