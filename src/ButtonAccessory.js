@@ -47,6 +47,8 @@ export default class ButtonAccessory {
         this.service.getCharacteristic(this.api.hap.Characteristic.On)
                     .onGet(this.getButtonOn.bind(this))
                     .onSet(this.setButtonOn.bind(this));
+
+		return this.service;
     }
 
 	/**
