@@ -1,5 +1,5 @@
 {
-    "pluginAlias": "SomfyRtsPlatform",
+    "pluginAlias": "Somfy Blinds Platform",
     "pluginType": "platform",
     "singular": false,
     "strictValidation": true,
@@ -9,12 +9,12 @@
             "platform": {
                 "title": "Platform",
                 "type": "string",
-                "const": "SomfyRtsPlatform"
+                "const": "Somfy Blinds Platform"
             },
             "name": {
                 "title": "Platform Name",
                 "type": "string",
-                "default": "Somfy RTS"
+                "default": "Somfy Blinds Platform"
             },
             "devices": {
                 "title": "Blinds",
@@ -27,7 +27,8 @@
                             "description": "Stable unique ID (used for UUID generation).",
                             "type": "integer",
 							"minimum": 0,
-							"maximum": 16777216
+							"maximum": 16777216,
+							"format": "int"
                         },
                         "name": {
                             "title": "Name",
@@ -57,7 +58,8 @@
                             "type": "integer",
 							"minimum": 500,
 							"maximum": 60000,
-                            "default": 10000
+                            "default": 10000,
+							"format": "int"
                         },
 						"repetitions": {
 							"title": "Command Repetitions",
@@ -65,7 +67,8 @@
 							"type": "integer",
 							"minimum": 1,
 							"maximum": 10,
-							"default": 4
+							"default": 4,
+							"format": "int"
 						}
                     },
                     "required": ["id", "name"]
