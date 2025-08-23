@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import path from 'path';
 
 /**
  * Private helper function used to get the state from file
@@ -7,7 +8,7 @@ import * as fs from 'fs';
  * @returns {Object} structured objected containing blind data
  */
 function readStateFromFile(api, id) {
-    const filename = fs.path.join(api.user.storagePath(), `${id}.json`);
+    const filename = path.join(api.user.storagePath(), `${id}.json`);
     let state;
 
     if (!fs.existsSync(filename)) {
@@ -35,7 +36,7 @@ function readStateFromFile(api, id) {
  * @returns {Object} structured objected containing blind data
  */
  function writeStateToFile(api, id, state) {
-    const filename = fs.path.join(api.user.storagePath(), `${id}.json`);
+    const filename = path.join(api.user.storagePath(), `${id}.json`);
     const toWrite = JSON.stringify(state, null, 4);
 
     fs.writeFileSync(filename, toWrite, (err) => {
