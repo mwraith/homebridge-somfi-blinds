@@ -76,7 +76,7 @@ export default class ButtonAccessory {
 		this.log.debug(`Function setOn called for button ${this.button} with value ${value}`);
 
 		// Send button press to RpiGpioRts
-		sendCommand(this.config, this.button);
+		sendCommand(this.api, this.config, this.button);
 
 		// Update current state to on
 		this.state = value;

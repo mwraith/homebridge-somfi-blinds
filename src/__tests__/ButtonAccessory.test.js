@@ -11,7 +11,7 @@ jest.mock('pigpio');
 jest.mock('homebridge');
 
 // Need to mock timers for the admin buttons that switch off after X ms
-jest.useFakeTimers();
+jest.useFakeTimers({ legacyFakeTimers: true });
 jest.spyOn(global, 'setTimeout');
 
 describe("Testing Button Accessory", () => {

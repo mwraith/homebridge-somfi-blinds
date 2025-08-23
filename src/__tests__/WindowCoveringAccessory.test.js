@@ -12,7 +12,7 @@ jest.mock('pigpio');
 jest.mock('homebridge');
 
 // Need to mock timers for the admin buttons that switch off after X ms
-jest.useFakeTimers();
+jest.useFakeTimers({ legacyFakeTimers: true });
 jest.spyOn(global, 'setTimeout');
 
 const Characteristic = api.hap.Characteristic;
@@ -56,6 +56,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be UP
         expect(spy).toHaveBeenCalledWith(
+            api,
             expect.objectContaining(config),
             'Up'
         );
@@ -79,6 +80,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be DOWN
         expect(spy).toHaveBeenCalledWith(
+            api,
             expect.objectContaining(config),
             'Down'
         );
@@ -121,6 +123,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be MY
         expect(spy).toHaveBeenCalledWith(
+            api,
             expect.objectContaining(config),
             'My'
         );
@@ -144,6 +147,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be DOWN
         expect(spy).toHaveBeenCalledWith(
+            api,
             expect.objectContaining(config),
             'Down'
         );
@@ -249,6 +253,7 @@ describe("Testing Window Covering Accessory", () => {
 
         // Expect button pressed to be MY 
         expect(spy).toHaveBeenCalledWith(
+            api,
             expect.objectContaining(config),
             'My'
         );

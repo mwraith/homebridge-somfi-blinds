@@ -94,6 +94,9 @@ let api = {
             'Switch': SwitchServiceMock,
             'WindowCovering': WindowCoveringMock
         }
+    },
+    'user': {
+        storagePath: jest.fn(() => './')
     }
 };
 

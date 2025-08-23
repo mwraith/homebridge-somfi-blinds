@@ -1,5 +1,6 @@
 import { sendCommand } from '../SendCommand.js';
 import * as BlindState from '../BlindState.js';
+import { api } from 'homebridge';
 
 // Mock the file system methods
 jest.mock('fs');
@@ -11,10 +12,10 @@ describe("Testing Send Command class", () => {
             "name": "test"
         };
 
-        sendCommand(config, 'Up');
+        sendCommand(api, config, 'Up');
 
         // Then get state
-        let state = BlindState.getRollingCode(config.id);
+        let state = BlindState.getRollingCode(api, config.id);
 
         // Check the rolling state is set
         expect(state).toEqual(2);
@@ -26,12 +27,12 @@ describe("Testing Send Command class", () => {
             "name": "test"
         };
 
-        sendCommand(config, 'Up');
+        sendCommand(api, config, 'Up');
 
-        sendCommand(config, 'Down');
+        sendCommand(api, config, 'Down');
 
         // Then get state
-        let state = BlindState.getRollingCode(config.id);
+        let state = BlindState.getRollingCode(api, config.id);
 
         // Check the rolling state is set
         expect(state).toEqual(3);

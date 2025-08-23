@@ -2,11 +2,12 @@ import * as fs from 'fs';
 
 /**
  * Private helper function used to get the state from file
+ * @param {Object} api - The Homebridge api
  * @param {String} id - Id of blind
  * @returns {Object} structured objected containing blind data
  */
-function readStateFromFile(id) {
-    const filename = `./${id}.json`;
+function readStateFromFile(api, id) {
+    const filename = fs.path.join(api.user.storagePath(), `${id}.json`);
     let state;
 
     if (!fs.existsSync(filename)) {
@@ -29,11 +30,12 @@ function readStateFromFile(id) {
 
 /**
  * Private helper function used to set the state in file
+ * @param {Object} api - The Homebridge api
  * @param {String} id - Id of blind
  * @returns {Object} structured objected containing blind data
  */
- function writeStateToFile(id, state) {
-    const filename = `./${id}.json`;
+ function writeStateToFile(api, id, state) {
+    const filename = fs.path.join(api.user.storagePath(), `${id}.json`);
     const toWrite = JSON.stringify(state, null, 4);
 
     fs.writeFileSync(filename, toWrite, (err) => {
@@ -44,13 +46,14 @@ function readStateFromFile(id) {
 /**
  * Handle requests to get the current value of the "On" characteristic
  * @method getOn
+ * @param {Object} api - The Homebridge api
  * @param {String} id - Id of blind
  * @returns {Boolean} - true = blind closed; false = blind open
  */
-export function getOn(id) {
+export function getOn(api, id) {
     if (!id) throw('No id passed to function');
 
-    let state = readStateFromFile(id);
+    let state = readStateFromFile(api, id);
 
     return state.on;
 }
@@ -58,31 +61,33 @@ export function getOn(id) {
 /**
  * Set the current value of the "On" characteristic
  * @method setOn
+ * @param {Object} api - The Homebridge api
  * @param {String} id - Id of blind
  * @param {String} value - Value to set
  * @returns {Boolean} - true = blind closed; false = blind open
  */
-export function setOn(id, value) {
+export function setOn(api, id, value) {
     if (!id) throw('No id passed to function');
 
-    let state = readStateFromFile(id);
+    let state = readStateFromFile(api, id);
 
     // Update value
     state["on"] = !!value;
 
-    writeStateToFile(id, state);
+    writeStateToFile(api, id, state);
 }
 
 /**
  * Handle requests to get the current value of the "On" characteristic
  * @method getRollingCode
+ * @param {Object} api - The Homebridge api
  * @param {String} id - Id of blind
  * @returns {Integer} - Value of the current rolling code
  */
- export function getRollingCode(id) {
+ export function getRollingCode(api, id) {
     if (!id) throw('No id passed to function');
 
-    let state = readStateFromFile(id);
+    let state = readStateFromFile(api, id);
 
     return state.rollingCode;
 }
@@ -90,19 +95,20 @@ export function setOn(id, value) {
 /**
  * Set the current value of the "On" characteristic
  * @method advanceRollingCode
+ * @param {Object} api - The Homebridge api
  * @param {String} id - Id of blind
  * @returns {Integer} - Value of the new rolling code
  */
- export function advanceRollingCode(id) {
+ export function advanceRollingCode(api, id) {
     if (!id) throw('No id passed to function');
 
-    let state = readStateFromFile(id);
+    let state = readStateFromFile(api, id);
 
     // Advance code
     state.rollingCode++;
 
     // Write to file
-    writeStateToFile(id, state);
+    writeStateToFile(api, id, state);
 
     return state.rollingCode;
 }

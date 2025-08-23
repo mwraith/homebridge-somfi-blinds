@@ -104,7 +104,7 @@ export default class WindowCoveringAccessory {
 		// If the blind is already moving send MY button and stop signal
 		if (this.currentState && this.currentState.positionState != PositionState.STOPPED) {
 			// Send My button to stop movement
-			sendCommand(this.config, 'My');
+			sendCommand(this.api, this.config, 'My');
 
 			// Update State to STOPPED
 			this.currentState.positionState = PositionState.STOPPED
@@ -158,10 +158,10 @@ export default class WindowCoveringAccessory {
 		}
 
 		// Send button press to RpiGpioRts
-		sendCommand(this.config, button);
+		sendCommand(this.api, this.config, button);
 
 		// Persist the change to the file
-		BlindState.setOn(this.config.id, internalState);
+		BlindState.setOn(this.api, this.config.id, internalState);
 
 		this.currentState = {
 			'positionState': value > 0 ? PositionState.INCREASING : PositionState.DECREASING,
@@ -232,7 +232,7 @@ export default class WindowCoveringAccessory {
 	 */
 	async getTargetPosition() {
 		// Read the state from a file
-		const state = BlindState.getOn(this.config.id);
+		const state = BlindState.getOn(this.api, this.config.id);
 
 		this.log.debug(`Get target position for ${this.config.id} - ${state} from file`);
 

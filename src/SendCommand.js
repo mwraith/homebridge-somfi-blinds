@@ -5,12 +5,13 @@ import * as BlindState from './BlindState.js';
  * Sends a button press command to RpiGpioRts but also maintains the
  * rolling code within the BlindState.
  * 
+ * @param {Object} api    Homebridge API object
  * @param {Object} config Homebridge config
  * @param {String} button Button to press (Up/Down/My/Prog)
  */
-export function sendCommand(config, button) {
+export function sendCommand(api, config, button) {
     // Get current rolling code
-    const rollingCode = BlindState.getRollingCode(config.id);
+    const rollingCode = BlindState.getRollingCode(api, config.id);
 
     // Number of repetitions to send. Sending multiple times can improve
     // the reception. But equally sending too many can also be picked up
@@ -22,5 +23,5 @@ export function sendCommand(config, button) {
     RpiGpioRts.sendCommand(config.id, RpiGpioRts.BUTTON[button], rollingCode, repetitions);
 
     // Advance the rolling code
-    BlindState.advanceRollingCode(config.id);
+    BlindState.advanceRollingCode(api, config.id);
 }

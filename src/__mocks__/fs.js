@@ -29,10 +29,20 @@ function existsSync(path) {
     return path in this.savedData;
 }
 
+/**
+ * Mocks path.join to just concatenate paths
+ * @param  {...any} paths
+ * @returns String
+ */
+function joinSync(...paths) {
+    return paths.join('');
+}
+
 // Setup mock methods
 fs.readFileSync = readFileSync;
 fs.writeFileSync = writeFileSync;
 fs.existsSync = existsSync;
 fs.savedData = {};
+fs.path = { join: joinSync }
 
 module.exports = fs;
