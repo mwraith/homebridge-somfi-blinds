@@ -1,3 +1,6 @@
+# New Version Using Raspberry Pi Pico
+Whilst this plugin is stable and working with Homebridge 2, in future it will be replaced by [homebridge-somfy-pico](https://github.com/mwraith/homebridge-somfy-pico), which uses a Raspberry Pi Pico connected via USB to the Homebridge server. The new plugin is currently in Beta, but for new users setting up for the first time, I would recommend you use the newer approach.
+
 # homebridge-somfi-blinds
 A [Homebridge](https://github.com/homebridge/homebridge) plugin to add HomeKit compatibility to Somfy RTS devices (rolling shutters, blinds, awnings, ...) requiring only a [Raspberry Pi](https://www.raspberrypi.org) and a simple 433 MHz transmitter. The hardware setup and part of the code base is adapted from [homebridge-rpi-rts](https://github.com/wibberryd/homebridge-rpi-rts/), but with a modification so that the device now appears as only a single stateful On/Off button in HomeKit rather than mirror the remote buttons of Up, Down, My, Prog. This makes it compatible with Apple HomeKit Scenes and Siri voice controls.
 
